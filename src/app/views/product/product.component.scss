@@ -1,0 +1,13 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+
+  .weight {
+    @media screen and (max-width: 480px) {
+      display: none;
+    }
+  }
+}
