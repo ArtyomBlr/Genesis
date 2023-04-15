@@ -1,7 +1,6 @@
 :host {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   width: 100%;
   height: 100%;
 
@@ -21,9 +20,24 @@
     }
   }
 
+  .view-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+
+    &__button {
+      padding: 15px;
+    }
+  }
+
   .weight {
     @media screen and (max-width: 480px) {
       display: none;
     }
   }
+}
+
+::ng-deep .mat-mdc-button-touch-target {
+  position: relative !important;
 }
