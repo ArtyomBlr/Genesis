@@ -8,7 +8,6 @@ import { ELEMENT_DATA } from '../constants/periodic-elements';
   providedIn: 'root'
 })
 export class ApiService {
-  // TODO: check
   public getRegion = (): Observable<PeriodicElement[]> =>
     timer(1000).pipe(switchMap(() => of([...ELEMENT_DATA])));
 }
