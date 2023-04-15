@@ -5,6 +5,22 @@
   width: 100%;
   height: 100%;
 
+  .view-toggler {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: #acacf2;
+    color: #ffffff;
+    
+    &__header {
+      margin: 0;
+      text-transform: capitalize;
+      font-size: 32px;
+      font-weight: 800;
+    }
+  }
+
   .weight {
     @media screen and (max-width: 480px) {
       display: none;

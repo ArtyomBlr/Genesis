@@ -4,7 +4,7 @@ import { BehaviorSubject, Observable, combineLatest, map, switchMap } from 'rxjs
 import { ApiService } from 'src/app/core/services/api.service';
 import { PeriodicElement } from 'src/app/core/models/periodic-elements.model';
 
-interface PaginatorEvent {
+interface PaginatorEventData {
   pageIndex: number;
   pageSize: number;
 }
@@ -15,6 +15,8 @@ interface PaginatorEvent {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProductComponent implements OnInit {
+  public view: string = 'list';
+
   public pageIndex = 0;
   public pageSize = 10;
   public length = 0;
@@ -22,7 +24,7 @@ export class ProductComponent implements OnInit {
   public paginationSettings$ = new BehaviorSubject({pageSize: this.pageSize, pageIndex: this.pageIndex });
 
   public periodicElements$: Observable<PeriodicElement[]> = this.apiService.getRegion();
-  public currentPeriodicElements$!: Observable<PeriodicElement[]>;
+  public paginatedPeriodicElements$!: Observable<PeriodicElement[]>;
 
   public displayedColumns$: Observable<string[]> = this.periodicElements$.pipe(
     map((data) => Object.keys(data[0]))
@@ -31,8 +33,8 @@ export class ProductComponent implements OnInit {
   public constructor(private apiService: ApiService) {}
 
   ngOnInit(): void {
-    this.currentPeriodicElements$ = this.periodicElements$.pipe(
-      switchMap((data: any) => {
+    this.paginatedPeriodicElements$ = this.periodicElements$.pipe(
+      switchMap((data: PeriodicElement[]) => {
         return combineLatest([this.periodicElements$, this.paginationSettings$])
           .pipe(
             map(([elements, {pageSize, pageIndex}]) => {
@@ -44,10 +46,14 @@ export class ProductComponent implements OnInit {
     )
   }
 
-  public onPageChange(event: PaginatorEvent): void {
+  public onPageChange(event: PaginatorEventData): void {
     this.pageIndex = event.pageIndex;
     this.pageSize = event.pageSize;
 
     this.paginationSettings$.next({ pageSize: this.pageSize, pageIndex: this.pageIndex });
+  }
+
+  public toggleView(): void {
+    this.view = this.view === 'list'? 'paginator' : 'list';
   }
 }
