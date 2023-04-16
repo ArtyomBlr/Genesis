@@ -6,22 +6,32 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
-## Code scaffolding
+# Requirements
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## komponent powinien mieć możliwość wyboru czy tabelka będzie zawierała paginację czy wszystkie dane będą wyświetlane jednocześnie
 
-## Build
+The top-right side of the page containse button "Change View". 
+Click on it and change the view (List view by default).
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+## dodatkowo dla opcji wyświetlania wszystkich danych jednocześnie należy zastosować mechanizm optymalizacyjny, żeby wyświetlenie 10 000 wierszy tabeli nie spowalniało przeglądarki
 
-## Running unit tests
+At the bottom of the page, you can find the button "Load more". 
+Click on it and load additional 20 items. If the elements run out, the button will disappear.
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## wyświetlana tabelka powinna być responsywna (dla mniejszych ekranów można zrezygnować z wyświetlania pewnych kolumn - to też może być zdefiniowane w przekazywanych do komponentu danych)
 
-## Running end-to-end tests
+The page has a responsive design (up to 375px).
+Weight property will be hidden as an example from 480px and less.
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+## komponent powinien informować rodzica o tym kiedy "załaduje" wszystkie dane do tabeli (można zasymulować ładowanie danych z API jakimś timeoutem i wyświetlić progressbar)
 
-## Further help
+The page has a loader that is waiting for the response result.
+In addition, shareReplay() was added for preventing multiple calls of the getRegion() method
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+## wskazane będzie użycie Material Design do budowania tabelki, progressbara oraz innych elementów komponentu
+
+Table, buttons, and paginator use Angular Material
+
+## dodatkowo zakładamy, że dane wejściowe to dane z API, które pochodzą z formularzy i nigdy nie ma pewności, że użytkownik je poprawnie uzupełnił (dane powinny być odpowiednio zabezpieczone przed wyświetleniem niepowołanego kodu JavaScript, HTML, null, undefined, etc.)
+
+Angular Material table protects such issues by default.

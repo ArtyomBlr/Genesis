@@ -1,0 +1,42 @@
+<div class="view-toggler">
+  <h1 class="view-toggler__header">{{ isListView ? 'list' : 'paginator' }}</h1>
+  <button 
+    class="view-toggler__button" 
+    mat-raised-button
+    color="primary" 
+    (click)="toggleView()">
+  Change View</button>
+</div>
+
+<div class="view-content">
+  <ng-container 
+    *ngIf="periodicElementsList$ | async as elements; else loader">
+    <app-table [elements]="elements" [columns]="columnsName"></app-table>
+  </ng-container>
+  
+  
+  <ng-container *ngIf="paginationSettings$ | async as settings">
+    <ng-container *ngIf="!isListView">
+        <mat-paginator 
+        [length]="itemsLength"
+        [pageSize]="settings.pageSize"
+        (page)="onPageChange($event)"
+        aria-label="Select page">
+      </mat-paginator>
+    </ng-container>
+  </ng-container>
+
+  <ng-container *ngIf="isListView">
+    <button 
+      class="view-content__button" 
+      [ngClass]="{hidden: isButtonHidden}"
+      mat-raised-button
+      color="primary"
+      (click)="loadMore()">
+    Load More</button>
+  </ng-container>
+</div>
+
+<ng-template #loader>
+  <app-loader></app-loader>
+</ng-template>
