@@ -4,6 +4,7 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 
 import { ApiService } from 'src/app/core/services/api.service';
 import { PeriodicElement } from 'src/app/core/models/periodic-elements.model';
+import { BASE_PAGINATOR_PARAMS } from 'src/app/core/constants/paginator';
 
 interface PaginatorEventData {
   pageIndex: number;
@@ -18,64 +19,50 @@ interface PaginatorEventData {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProductComponent implements OnInit {
-  public isListView = false;
+  public isListView = true;
   public columnsName!: string[];
 
   // Paginator props
-  public pageIndex = 0;
-  public pageSize = 10;
-  public itemsLength = 0; 
-
-  private paginationSettings$ = new BehaviorSubject(
-      {pageSize: this.pageSize, pageIndex: this.pageIndex }
+  public paginationSettings$ = new BehaviorSubject(
+    {pageSize: BASE_PAGINATOR_PARAMS.pageSize, pageIndex: BASE_PAGINATOR_PARAMS.pageIndex }
     );
+    
+  public itemsLength = 0;
   
   // List props
   public isButtonHidden = false;
-  private baseStep = 10;
+  private baseStep = BASE_PAGINATOR_PARAMS.baseStep;
   private itemCount$ = new BehaviorSubject<number>(this.baseStep);
 
-  private periodicElements$: Observable<PeriodicElement[]> = this.apiService.getRegion()
-
-  public paginatedPeriodicElements$!: Observable<PeriodicElement[]>;
-  public loadedPeriodicElements$!: Observable<PeriodicElement[]>; 
+  private allPeriodicElements$: Observable<PeriodicElement[]> = this.apiService.getPeriodicElements();
+  public periodicElementsList$!: Observable<PeriodicElement[]>;
 
   public constructor(private apiService: ApiService) {}
 
   ngOnInit(): void {
-    // TODO: think how can I optimize it
-    this.periodicElements$
+    this.allPeriodicElements$
       .pipe(
         map((data) => Object.keys(data[0])),
         untilDestroyed(this)
       )
       .subscribe((data) => this.columnsName = data);
 
-    this.paginatedPeriodicElements$ = combineLatest([this.periodicElements$, this.paginationSettings$])
+    this.periodicElementsList$ = combineLatest([this.allPeriodicElements$, this.paginationSettings$, this.itemCount$])
       .pipe(
-          map(([elements, {pageSize, pageIndex}]) => {
+          map(([elements, {pageSize, pageIndex}, itemCount]) => {
             this.itemsLength = elements.length;
 
-            return elements.slice(pageIndex * pageSize, pageIndex * pageSize + pageSize);
-          })
-        )
-
-    this.loadedPeriodicElements$ = 
-      combineLatest([this.periodicElements$, this.itemCount$])
-        .pipe(
-          map(([elements, itemCount]) => {
             if (elements.length <= itemCount) this.isButtonHidden = true;
+
+            if (this.isListView) return elements.slice(0, itemCount);
             
-            return elements.slice(0, itemCount);
+            return elements.slice(pageIndex * pageSize, pageIndex * pageSize + pageSize);
           })
         )
   }
 
   public onPageChange = (event: PaginatorEventData): void => {
-    this.pageIndex = event.pageIndex;
-    this.pageSize = event.pageSize;
-
-    this.paginationSettings$.next({ pageSize: this.pageSize, pageIndex: this.pageIndex });
+    this.paginationSettings$.next({ pageSize: event.pageSize, pageIndex: event.pageIndex });
   }
 
   public loadMore(): void {
@@ -84,5 +71,12 @@ export class ProductComponent implements OnInit {
 
   public toggleView = (): void => {
     this.isListView = !this.isListView;
+
+    if (this.isListView) {
+      this.itemCount$.next(BASE_PAGINATOR_PARAMS.baseStep);
+      return;
+    }
+    
+    this.paginationSettings$.next({ pageSize: BASE_PAGINATOR_PARAMS.pageSize, pageIndex: BASE_PAGINATOR_PARAMS.pageIndex });
   }
 }
